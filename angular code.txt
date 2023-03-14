@@ -1,0 +1,221 @@
+whatever i have entered in textbox it will show that content intially::
+html
+<input type="text" [(ngModel)]="name">
+<p style="color:green">{{name}}</p>
+ts
+  name = 'Anjali';
+app.module.ts
+import { FormsModule } from '@angular/forms';
+
+create custom component::
+right clicked on app->create folder->folder means server->then right click on server->create file->file means server.component.html
+
+app.module.ts
+import { ServerComponent } from './server/server.component';
+custom component html
+<h3>hello</h3>
+
+debug shotcut::
+inspect->source->pages->webpack
+ts
+import { Component } from '@angular/core';
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html'
+})
+export class ServerComponent {
+
+}
+app.component.html::
+<app-server></app-server>
+
+custom attribute::
+app.component.html
+<div app-servers></div>
+app.servers.ts
+selector: '[app-servers]',
+
+like css class::
+app.component.html
+<div class="app-servers"></div>
+app.servers.ts
+selector: '.app-servers',
+
+Inline style & template::
+app.component.html
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>I'm in the AppComponent!</h3>
+      <hr>
+      <app-servers></app-servers>
+      <!--<div app-servers></div>-->
+      <!--<div class="app-servers"></div>-->
+    </div>
+  </div>
+</div>
+ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: '<app-server></app-server><app-server></app-server>',
+  // styleUrls: ['./app.component.css']
+  styles: [`
+    h3 {
+      color: dodgerblue;
+    }
+  `]
+})
+export class AppComponent {
+}
+
+pass data from parent component to child component using @Input::
+
+parent component means app.component.html
+<app-servers [parent]="parentMsg"></app-servers>
+ts
+ parentMsg="This is data from parent";
+child components means servers.component.html::with alias name::
+<h3>{{parentData}}</h3>
+ts
+@Input('parent') parentData:any;
+servers.component.html::without alias name::
+<h3>{{parent}}</h3>
+ts
+@Input() parent:any;
+
+pass data from child component to parent component using @Output::
+
+child components means servers.component.html::with alias name::
+<button (click)="onFireEvent()">click event:data passed to parent</button>
+ts
+@Output() child = new EventEmitter<any>();
+message="this from child message";
+onFireEvent(){
+  this.child.emit(this.message);
+}
+parent component means app.component.html
+<app-servers (child)="msg=$event" [parent]="parentMsg"></app-servers>
+<h3>parent component::{{msg}}</h3>
+ts
+ msg:any;
+
+whatever data is there in child component that exactly showing in parent component using @Output::
+child components means servers.component.html::
+<button (click)="onFireEvent()">click event:data passed to parent</button>
+<input type="text" (input)="updateMessage($event)">
+<h3>childInput::{{message}}</h3>
+ts
+@Output() child = new EventEmitter<any>();
+message="this from child message";
+onFireEvent(){
+  this.child.emit(this.message);
+}
+updateMessage(e:any){
+this.message = e .target.value;
+}  
+
+parent component means app.component.html::
+<!-- <app-servers (child)="msg=$event" [parent]="parentMsg"></app-servers> (or) -->
+<!-- <app-servers (child)="updateData($event)" [parent]="parentMsg"></app-servers> -->
+<h3>parent component::{{msg}}</h3>
+ts
+ msg:any;
+ updateData(d:any){
+  this.msg = d;
+ }
+
+pass data from child component to parent component using TemplateReferenceVariable::
+child components means servers.component.html::
+<input type="text" [(ngModel)]="trv">
+ts
+trv="template reference variable";
+
+parent component means app.component.html::
+<app-servers #child></app-servers>
+<div>parent component::{{child.trv}}</div>
+there is no parent.component.ts data
+
+pass data from child component to parent component using @viewChild::
+child components means servers.component.html::
+there is no servers.component.html data
+ts
+data="this is viewChild111";
+passedtoParent(){
+  return this.data;
+}
+parent component means app.component.html::
+<button (click)="test()">click viewChild data</button>
+ts
+ @ViewChild(ServersComponent) childToParent:any;
+ test(){
+  console.log(this.childToParent.passedtoParent());
+ }
+
+whatever data is there in child component that exactly showing in parent component using @viewChild::
+child components means servers.component.html::
+<input type="text" [(ngModel)]="data">
+<div>{{data}}</div>
+ts
+// @viewChild
+data="this is viewChild111";
+passedtoParent(){
+  return this.data;
+}
+parent component means app.component.html::
+<button (click)="test()">click viewChild data</button>
+<div>viewChild data in parent component::{{childData}}</div>
+ts
+ @ViewChild(ServersComponent) childToParent:any;
+ childData="";
+ test(){
+  this.childData = this.childToParent.passedtoParent();
+ }
+
+Difference b/w @viewChild vs @viewChildren::
+app.com.html
+<!-- @viewChild vs @viewChildren -->
+<!-- viewChild -->
+<p #para>this is viewChild1</p>
+<p #para>this is viewChild2</p>
+<button (click)="test1()">viewChild</button>
+<!-- viewChildren -->
+<p #vChildren>this is viewChildren1</p>
+<p #vChildren>this is viewChildren2</p>
+<p #vChildren>this is viewChildren3</p>
+<p #vChildren>this is viewChildren4</p>
+<button (click)="test2()">viewChildren</button>
+ts
+//  <!-- @viewChild vs @viewChildren -->
+// viewChild
+@ViewChild('para') p:any;
+ test1(){
+console.log(this.p.nativeElement.innerText);
+ }
+//  ViewChildren
+ @ViewChildren('vChildren') cRen:any;
+ test2(){
+  console.log(this.cRen._results[0].nativeElement.innerText);
+  console.log(this.cRen._results[1].nativeElement.innerText);
+  console.log(this.cRen._results[2].nativeElement.innerText);
+  console.log(this.cRen._results[3].nativeElement.innerText);
+  for(let ele of this.cRen){
+    console.log(ele.nativeElement.innerText);
+  }
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
